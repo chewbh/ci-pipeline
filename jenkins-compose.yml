@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  jenkins: 
+    image: boonlogic/jenkins:lts
+    # restart: unless-stopped
+    logging:
+      driver: "journald"
+    ports:
+      - "8085:8080"
+      - "50000:50000"
+    environment:
+      - GERRIT_HOST_NAME="teto"
+      - GERRIT_FRONT_END_URL="http://teto:8080"
+      - ROOT_URL="http://teto:8085"
+      - JAVA_OPTS="-Duser.timezone=Asia/Singapore -Djenkins.install.runSetupWizard=false"
+    volumes:
+      - /developments/dockers/ci-pipeline-storage:/var/jenkins_home
+    

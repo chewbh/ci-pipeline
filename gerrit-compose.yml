@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  gerrit: 
+    image: openfrontier/gerrit:2.14.5.1
+    # restart: unless-stopped
+    logging:
+      driver: "journald"
+    ports:
+      - "29418:29418"
+      - "8080:8080"
+    links:
+      - pg-gerrit
+    depends_on:
+      - pg-gerrit
+    environment:
+      - WEBURL=http://teto:8080
+      - DATABASE_TYPE=postgresql
+      - DB_PORT_5432_TCP_ADDR=pg-gerrit
+      - DB_PORT_5432_TCP_PORT=5432
+      - DB_ENV_POSTGRES_DB=gerrit
+      - DB_ENV_POSTGRES_USER=gerrit
+      - DB_ENV_POSTGRES_PASSWORD=secret
+      - AUTH_TYPE=LDAP
+      - LDAP_SERVER=ldap://172.18.0.1:10389
+      - LDAP_REFERRAL=follow
+      - LDAP_ACCOUNTBASE=dc=example,dc=edu
+      - LDAP_ACCOUNTPATTERN=(cn=$${username})
+      - LDAP_ACCOUNTFULLNAME=description
+      - LDAP_ACCOUNTSSHUSERNAME=cn
+      - LDAP_USERNAME=cn=Directory Manager
+      - LDAP_PASSWORD=password
+        #- INITIAL_ADMIN_USER=admin
+        #- INITIAL_ADMIN_PASSWORD=admin
+        #- SMTP_SERVER=
+        #- SMTP_USER=
+        #- SMTP_PASS=
+        #- USER_EMAIL=
+      - GERRIT_INIT_ARGS=--install-plugin=download-commands --install-plugin=replication
+      #- JENKINS_HOST: jenkins
+      #- OAUTH_BITBUCKET_CLIENT_ID=${OAUTH_BITBUCKET_CLIENT_ID}
+      #- OAUTH_BITBUCKET_CLIENT_SECRET=${OAUTH_BITBUCKET_CLIENT_SECRET}
+      #- OAUTH_BITBUCKET_FIX_LEGACY_USER_ID=${OAUTH_BITBUCKET_FIX_LEGACY_USER_ID}
+      #- OAUTH_ALLOW_EDIT_FULL_NAME=${OAUTH_ALLOW_EDIT_FULL_NAME}
+      #- OAUTH_ALLOW_REGISTER_NEW_EMAIL=${OAUTH_ALLOW_REGISTER_NEW_EMAIL}
+    volumes:
+      - /developments/dockers/gerrit/storage:/var/gerrit/review_site
+      - /developments/dockers/gerrit/ssh:/var/gerrit/.ssh      
+
+  pg-gerrit:
+    image: postgres:9.6
+    # container_name: pg-gerrit
+    # restart: unless-stopped
+    logging:
+      driver: "journald"
+    ports:
+      - "5432"
+    environment:
+      - POSTGRES_USER=gerrit
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=gerrit
+    volumes:
+      - /developments/dockers/gerrit/db:/var/lib/postgresql/data
+

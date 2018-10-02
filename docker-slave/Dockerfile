@@ -27,4 +27,4 @@ RUN usermod -aG docker jenkins
 
 USER jenkins
 
-RUN mkdir /home/jenkins/gradle-cache
+RUN mkdir /home/jenkins/gradle-cache && chown -R jenkins:jenkins /home/jenkins/gradle-cache

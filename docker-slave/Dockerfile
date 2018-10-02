@@ -27,3 +27,4 @@ RUN usermod -aG docker jenkins
 
 USER jenkins
 
+RUN mkdir /home/jenkins/gradle-cache
